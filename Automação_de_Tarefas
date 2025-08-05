@@ -1,0 +1,111 @@
+#Automação de Tarefas: Criando um script para organizar arquivos em pastas com base em seus tipos 
+#(imagens, documentos, etc.).
+
+import os
+import shutil
+
+# --- 1. CONFIGURAÇÃO ---
+# A ideia central do script é:
+# 1 - Definir a pasta que você quer organizar.
+# 2 - Listar todos os arquivos dentro dessa pasta.
+# 3 - Para cada arquivo, verificar sua extensão (por exemplo, .jpg, .pdf, .txt).
+# 4 - Com base na extensão, criar uma pasta de destino (por exemplo, Imagens, Documentos).
+# 5 - Define o caminho completo do arquivo na origem e no destino.
+# 6 - Mover o arquivo para a pasta correspondente.
+
+# Definindo a pasta a organizar
+pasta_origem = '/Users/filipemoretifilipe/Desktop'
+
+# Mapiando as extensões dos arquivos para os nomes das pastas
+tipos_de_arquivos = {
+    'Imagens': ['.jpg', '.jpeg', '.png', '.gif', '.bmp', 'Captura de Tela'],
+    'Documentos': ['.pdf', '.docx', '.doc', '.xlsx', '.xls', '.pptx', '.txt'],
+    'Vídeos': ['.mp4', '.mov', '.avi', '.mkv'],
+    'Áudios': ['.mp3', '.wav', '.aac'],
+    'Compactados': ['.zip', '.rar', '.7z', '.cpgz'],
+    'Executaveis': ['.exe', '.msi'],
+    'Scripts': ['.py', '.js', '.html', '.css']
+}
+
+# DECLARANDO A LISTA AQUI!
+log_mensagens = []
+
+# --- 2. LISTAGEM E ORGANIZAÇÃO DOS ARQUIVOS ---
+try:
+    arquivos_na_pasta = [f for f in os.listdir(pasta_origem) if os.path.isfile(os.path.join(pasta_origem, f))]
+except FileNotFoundError:
+    log_mensagens.append(f"❌ Erro: O diretório '{pasta_origem}' não foi encontrado.")
+    arquivos_na_pasta = []
+
+# Percorre cada arquivo na pasta
+for nome_arquivo in arquivos_na_pasta:
+    extensao_arquivo = os.path.splitext(nome_arquivo)[1].lower()
+    foi_movido = False
+    
+    for tipo, extensoes in tipos_de_arquivos.items():
+        if extensao_arquivo in extensoes:
+            pasta_destino = os.path.join(pasta_origem, tipo)
+            caminho_origem = os.path.join(pasta_origem, nome_arquivo)
+            caminho_destino = os.path.join(pasta_destino, nome_arquivo)
+            
+            if not os.path.exists(pasta_destino):
+                os.makedirs(pasta_destino)
+                
+            try:
+                shutil.move(caminho_origem, caminho_destino)
+                log_mensagens.append(f'✅ Movido: {nome_arquivo} para {tipo}/')
+            except FileNotFoundError:
+                log_mensagens.append(f'❌ Erro: O arquivo "{nome_arquivo}" não foi encontrado. Ignorando...')
+            
+            foi_movido = True
+            break
+            
+    if not foi_movido:
+        pasta_outros = os.path.join(pasta_origem, 'Outros')
+        caminho_origem = os.path.join(pasta_origem, nome_arquivo)
+        caminho_destino = os.path.join(pasta_outros, nome_arquivo)
+        
+        if not os.path.exists(pasta_outros):
+            os.makedirs(pasta_outros)
+            
+        try:
+            shutil.move(caminho_origem, caminho_destino)
+            log_mensagens.append(f'✅ Movido: {nome_arquivo} para Outros/')
+        except FileNotFoundError:
+            log_mensagens.append(f'❌ Erro: O arquivo "{nome_arquivo}" não foi encontrado. Ignorando...')
+
+# --- 3. EXIBIÇÃO DO RELATÓRIO FINAL ---
+print("\n--- Relatório de Organização de Arquivos ---")
+if not log_mensagens:
+    print("Nenhum arquivo foi processado. Verifique o caminho da pasta.")
+else:
+    for mensagem in log_mensagens:
+        print(mensagem)
+print("\nOrganização de arquivos concluída!")
+
+
+--- Relatório de Organização de Arquivos ---
+✅ Movido: Captura de Tela 2023-12-09 às 14.15.07 (2).png para Imagens/
+✅ Movido: Captura de Tela 2023-11-05 às 16.18.16.png para Imagens/
+✅ Movido: Comparador+de+Renda+Fixa.xlsx para Documentos/
+✅ Movido: Captura de Tela 2024-08-20 às 14.20.04 (2).png para Imagens/
+✅ Movido: CV_Lk_29_7_25.pdf para Documentos/
+✅ Movido: Profile_CV_02_24.pdf para Documentos/
+✅ Movido: Captura de Tela 2023-10-07 às 17.23.04.png para Imagens/
+✅ Movido: Captura de Tela 2023-11-05 às 16.18.16 (2).png para Imagens/
+✅ Movido: GitHubDesktop-x64.zip para Compactados/
+✅ Movido: Comparador+de+Renda+Fixa.xlsx.cpgz para Compactados/
+✅ Movido: Captura de Tela 2023-12-09 às 22.10.54.png para Imagens/
+✅ Movido: Captura de Tela 2024-08-20 às 14.20.17 (2).png para Imagens/
+✅ Movido: Captura de Tela 2024-08-20 às 14.20.07 (2).png para Imagens/
+✅ Movido: Captura de Tela 2023-05-01 às 14.08.48 (2).png para Imagens/
+✅ Movido: Captura de Tela 2023-11-05 às 16.17.32 (2).png para Imagens/
+✅ Movido: Captura de Tela 2024-08-20 às 14.20.28 (2).png para Imagens/
+✅ Movido: Captura de Tela 2023-06-09 às 22.13.49.png para Imagens/
+✅ Movido: Captura de Tela 2024-08-20 às 14.20.23.png para Imagens/
+✅ Movido: Captura de Tela 2023-11-05 às 16.17.32.png para Imagens/
+✅ Movido: Captura de Tela 2023-07-21 às 22.14.02.png para Imagens/
+✅ Movido: Captura de Tela 2023-07-21 às 22.14.16.png para Imagens/
+✅ Movido: Captura de Tela 2023-07-21 às 22.12.57 (2).png para Imagens/
+
+Organização de arquivos concluída!
